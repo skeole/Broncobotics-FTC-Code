@@ -61,8 +61,8 @@ class TeleOp201Logic extends TeleOpLogicBase {
 
     public void set_keybinds() {
         // Arm
-        new_keybind("Left", "driver dpad_up", "default", "normal", 1.0);
-        new_keybind("Left", "driver dpad_down", "default", "normal", 0.1);
+        new_keybind("Left", "operator dpad_up", "default", "normal", 1.0);
+        new_keybind("Left", "operator dpad_down", "default", "normal", 0.1);
 
         // V4B
         new_keybind("Virtual", "operator right_stick_y", "default", 1.0, 1.0);

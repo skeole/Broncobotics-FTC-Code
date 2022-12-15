@@ -15,8 +15,8 @@ import java.util.Map;
 public class TeleOpLogicBase extends RobotHardware {
     //run .init201() then .init()
     double previous_time = System.nanoTime() / 1000000000.0;
-    double current_time = System.nanoTime() / 1000000000.0;
-    double delta_time = 0;
+    public double current_time = System.nanoTime() / 1000000000.0;
+    public double delta_time = 0;
 
     public StandardTrackingWheelLocalizer position_tracker;
 

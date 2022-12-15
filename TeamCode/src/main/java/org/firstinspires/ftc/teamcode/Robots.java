@@ -206,6 +206,68 @@ public class Robots {
             "operator left_trigger", "operator right_trigger", "driver left_trigger"
     )); //DO NOT CHANGE THIS
 
+    public void init_freight_frenzy() {
+        dc_motor_names = new ArrayList<>(Arrays.asList("duckWheel", "arm"));
+        max_power = new double[] {0.5, 0.5};
+        min_power = new double[] {-0.5, -0.1};
+        motor_max_positions = new double[] {Double.POSITIVE_INFINITY, 1800};
+        motor_min_positions = new double[] {Double.NEGATIVE_INFINITY, 0};
+        invert_dc_motors = new boolean[] {false, false};
+        p_weights = new double[] {0, 0.05};
+        d_weights = new double[] {0, 0};
+
+        servo_names = new ArrayList<>(Arrays.asList("claw"));
+        servo_max_positions = new double[] {1.0};
+        servo_min_positions = new double[] {0.0};
+
+        cr_servo_names = new ArrayList<>(Arrays.asList());
+        invert_cr_servos = new boolean[] {};
+
+        distance_sensor_names = new ArrayList<>(Arrays.asList("d_sensor"));
+
+        touch_sensor_names = new ArrayList<>(Arrays.asList());
+
+        color_sensor_names = new ArrayList<>(Arrays.asList());
+
+        led_names = new ArrayList<>(Arrays.asList());
+
+        strafe = 1.0;
+        turning_weight = 1.0;
+        distance_weight = 1.0;
+
+        locked_motion = false;
+        locked_rotation = false;
+
+        usePID = false;
+        p_weight = 0.025;
+        d_weight = 0.85;
+
+        axesOrder = AxesOrder.XYZ;
+        invertIMU = false;
+
+        useRoadRunner = false;
+        distance_weight_two = 0.0;
+        ticks_per_revolution = 0.0;
+        wheel_radius = 0.0;
+        gear_ratio = 0.0;
+        lateral_distance = 0.0;
+        forward_offset = 0.0;
+        integer_overflow = false;
+
+        forward_multiplier = 0.0;
+        strafing_multiplier = 0.0;
+        turning_multiplier = 0.0;
+
+        robot_width = 0;
+        robot_length = 0;
+
+        encoderNames = new ArrayList<>(Arrays.asList("leftEncoder", "rightEncoder", "frontEncoder"));
+        invert_encoders = new boolean[] {false, false, false};
+        //ordered by left, right, front
+        wheel_names = new ArrayList<>(Arrays.asList("rightFront", "rightBack", "leftBack", "leftFront"));
+        //ordered by right front, right back, left back, left front
+    }
+
     public void init_base() { //copy this if you want to set up a different robot
         dc_motor_names = new ArrayList<>(Arrays.asList());
         max_power = new double[] {};
@@ -231,9 +293,9 @@ public class Robots {
 
         led_names = new ArrayList<>(Arrays.asList());
 
-        strafe = 0.0;
-        turning_weight = 0.0;
-        distance_weight = 0.0;
+        strafe = 1.0;
+        turning_weight = 1.0;
+        distance_weight = 1.0;
 
         locked_motion = false;
         locked_rotation = false;

@@ -10,6 +10,8 @@ import org.firstinspires.ftc.teamcode.Logic.TeleOpLogicBase;
 
 class DriverPracticeLogic extends TeleOpLogicBase {
 
+    public double starting_time;
+
     public void execute_non_driver_controlled() {
 
         if (useRoadRunner) {
@@ -25,6 +27,9 @@ class DriverPracticeLogic extends TeleOpLogicBase {
             telemetry.addData("current angle", current_angle);
         }
 
+        telemetry.addData("cycles per second", 0.1 * ((int) (10 / delta_time)));
+        telemetry.addData("elapsed time", 0.1 * ((int) (10.0 * (starting_time - current_time))));
+
         telemetry.addData("angle to field", angle());
 
         if (buttons[keys.indexOf("driver a")]) {
@@ -38,9 +43,9 @@ class DriverPracticeLogic extends TeleOpLogicBase {
         }
     }
 
-
     public void init(HardwareMap hm, Telemetry tm) {
-        init201();
+        starting_time = System.nanoTime() / 1000000000.0;
+        init_base();
         initialize_hardware(hm, tm);
         setZeroAngle(0);
         button_types[keys.indexOf("driver a")] = 3; //1 = default, 2 = toggle, 3 = button
