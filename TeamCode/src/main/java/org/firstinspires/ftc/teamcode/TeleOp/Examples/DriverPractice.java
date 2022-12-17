@@ -25,12 +25,13 @@ class DriverPracticeLogic extends TeleOpLogicBase {
         if ((useRoadRunner) || (usePID)) {
             telemetry.addData("target angle", target_angle);
             telemetry.addData("current angle", current_angle);
+
+            telemetry.addData("angle to field", angle());
         }
 
         telemetry.addData("cycles per second", 0.1 * ((int) (10 / delta_time)));
         telemetry.addData("elapsed time", 0.1 * ((int) (10.0 * (starting_time - current_time))));
 
-        telemetry.addData("angle to field", angle());
 
         if (buttons[keys.indexOf("driver a")]) {
             telemetry.addData("resetting", "imu angle");

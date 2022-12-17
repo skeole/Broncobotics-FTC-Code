@@ -73,18 +73,18 @@ public class Robots {
     }
 
     public void init202() {
-        dc_motor_names = new ArrayList<>(Arrays.asList());
-        max_power = new double[] {};
-        min_power = new double[] {};
-        motor_max_positions = new double[] {};
-        motor_min_positions = new double[] {};
-        invert_dc_motors = new boolean[] {};
-        p_weights = new double[] {};
-        d_weights = new double[] {};
+        dc_motor_names = new ArrayList<>(Arrays.asList("joint1right", "joint2"));
+        max_power = new double[] {0.125, 0.4};
+        min_power = new double[] {-0.5, -0.4};
+        motor_max_positions = new double[] {Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY};
+        motor_min_positions = new double[] {Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY};
+        invert_dc_motors = new boolean[] {false, false};
+        p_weights = new double[] {0.02, 0.02};
+        d_weights = new double[] {0, 0};
 
-        servo_names = new ArrayList<>(Arrays.asList());
-        servo_max_positions = new double[] {};
-        servo_min_positions = new double[] {};
+        servo_names = new ArrayList<>(Arrays.asList("clawAligner", "claw"));
+        servo_max_positions = new double[] {1, 1};
+        servo_min_positions = new double[] {0, 0};
 
         positions = new double[][] {
                 {0, 100, 200, 300}, //Arm Heights
@@ -103,13 +103,13 @@ public class Robots {
         led_names = new ArrayList<>(Arrays.asList());
 
         strafe = 0.0;
-        turning_weight = 0.0;
+        turning_weight = 1.0;
         distance_weight = 1.0;
 
-        locked_motion = false;
+        locked_motion = true;
         locked_rotation = false;
 
-        usePID = false;
+        usePID = true;
         p_weight = 0.025;
         d_weight = 0.85;
 
@@ -198,12 +198,12 @@ public class Robots {
     public ArrayList<String> wheel_names;
 
     public ArrayList<String> keys = new ArrayList<>(Arrays.asList(
-            "operator a", "operator b", "operator x", "operator y", "operator dpad_up", "operator dpad_down",
-            "operator dpad_left", "operator dpad_right", "operator left_bumper", "operator right_bumper",
-            "driver a", "driver b", "driver x", "driver y", "driver dpad_up", "driver dpad_down",
-            "driver dpad_left", "driver dpad_right", "driver left_bumper", "driver right_bumper",
-            "operator left_stick_x", "operator right_stick_x", "operator left_stick_y", "operator right_stick_y",
-            "operator left_trigger", "operator right_trigger", "driver left_trigger"
+            "operator a", "operator b", "operator x", "operator y", "operator dpad_up",
+            "operator dpad_down", "operator dpad_left", "operator dpad_right", "operator left_bumper", "operator right_bumper",
+            "driver a", "driver b", "driver x", "driver y", "driver dpad_up",
+            "driver dpad_down", "driver dpad_left", "driver dpad_right", "driver left_bumper", "driver right_bumper",
+            "operator left_stick_x", "operator right_stick_x", "operator left_stick_y", "operator right_stick_y", "operator left_trigger",
+            "operator right_trigger", "driver left_trigger"
     )); //DO NOT CHANGE THIS
 
     public void init_freight_frenzy() {

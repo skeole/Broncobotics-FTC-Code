@@ -11,6 +11,8 @@ import org.firstinspires.ftc.teamcode.Logic.TeleOpLogicBase;
 
 class TeleOpExampleLogic extends TeleOpLogicBase { //You have to change the class name here
 
+    public double starting_time;
+
     public void execute_non_driver_controlled() {
         //this will have the telemetry, LEDs, etc.
 
@@ -31,6 +33,10 @@ class TeleOpExampleLogic extends TeleOpLogicBase { //You have to change the clas
             telemetry.addData("angle to field", angle());
         }
 
+        telemetry.addData("cycles per second", 0.1 * ((int) (10 / delta_time)));
+        telemetry.addData("elapsed time", 0.1 * ((int) (10.0 * (starting_time - current_time))));
+
+
         //robot.telemetry.addData("Arm Position: ", robot.dc_motor_list[dc_motor_names.indexOf("arm")].getCurrentPosition());
 
         /* EXAMPLE - set LED color if distance sensor detects something
@@ -50,7 +56,8 @@ class TeleOpExampleLogic extends TeleOpLogicBase { //You have to change the clas
     //Initialization
 
     public void init(HardwareMap hm, Telemetry tm) {
-        init201();
+        starting_time = System.nanoTime() / 1000000000.0;
+        init_base();
         initialize_hardware(hm, tm);
         setZeroAngle(-90); //Relative to Driver, Positive = Clockwise
         //ex. if robot facing left, then starting angle = -90
