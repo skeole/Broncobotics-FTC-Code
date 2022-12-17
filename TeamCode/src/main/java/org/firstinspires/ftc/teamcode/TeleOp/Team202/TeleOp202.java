@@ -136,7 +136,7 @@ class TeleOp202Logic extends TeleOpLogicBase {
     public void init(HardwareMap hm, Telemetry tm) {
         starting_time = System.nanoTime() / 1000000000.0;
         init202();
-        initialize_hardware(hm, tm);
+        initialize_logic(hm, tm);
         dc = map.get(DcMotor.class, "joint1left");
         setZeroAngle(0);
     }

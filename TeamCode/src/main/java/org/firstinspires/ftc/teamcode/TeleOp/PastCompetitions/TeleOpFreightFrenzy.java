@@ -50,7 +50,7 @@ class TeleOpFreightFrenzyLogic extends TeleOpLogicBase { //You have to change th
 
     public void init(HardwareMap hm, Telemetry tm) {
         init201();
-        initialize_hardware(hm, tm);
+        initialize_logic(hm, tm);
         setZeroAngle(-90); //Relative to Driver, Positive = Clockwise
         //ex. if robot facing left, then starting angle = -90
         //target_positions[dc_motor_names.size() + servo_names.indexOf("right")] = 1.0;

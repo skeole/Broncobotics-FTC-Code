@@ -47,7 +47,7 @@ class DriverPracticeLogic extends TeleOpLogicBase {
     public void init(HardwareMap hm, Telemetry tm) {
         starting_time = System.nanoTime() / 1000000000.0;
         init_base();
-        initialize_hardware(hm, tm);
+        initialize_logic(hm, tm);
         setZeroAngle(0);
         button_types[keys.indexOf("driver a")] = 3; //1 = default, 2 = toggle, 3 = button
     }

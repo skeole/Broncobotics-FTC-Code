@@ -2,8 +2,10 @@ package org.firstinspires.ftc.teamcode.Logic;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.checkerframework.checker.nullness.qual.RequiresNonNull;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Logic.RoadRunner.StandardTrackingWheelLocalizer;
 
 import java.util.ArrayList;
@@ -41,14 +43,14 @@ public class TeleOpLogicBase extends RobotHardware {
                 for modifier3: angle * 1000 (for angle to remain the same set angle to precisely 1 because ain't no way I set angle to 0.001)
          */
 
-    public double[] dc_times_started = new double[dc_motor_names.size()]; //in seconds
-    public double[] dc_target_positions = new double[dc_motor_names.size()];
-    public double[][] error = new double[dc_motor_names.size()][2]; //1st is previous, 2nd is current
+    public double[] dc_times_started; //in seconds
+    public double[] dc_target_positions;
+    public double[][] error; //1st is previous, 2nd is current
 
-    public double[] servo_times_started = new double[servo_names.size()];
-    public double[] servo_target_positions = new double[servo_names.size()];
+    public double[] servo_times_started;
+    public double[] servo_target_positions;
 
-    public double[] cr_times_started = new double[cr_servo_names.size()];
+    public double[] cr_times_started;
 
     public int[] button_types = new int[27]; //1 = default, 2 = toggle, 3 = button
     public int[] key_values = new int[27]; //number of times button/axis is "activated"
@@ -76,6 +78,19 @@ public class TeleOpLogicBase extends RobotHardware {
 
         if ((useRoadRunner) && (usePID)) throw new IllegalArgumentException("You cannot use both RoadRunner and the build-in PID");
         if (((locked_motion) || (locked_rotation)) && !((useRoadRunner) || (usePID))) throw new IllegalArgumentException("You can't use locked motion or rotion without a PID method");
+    }
+
+    public void initialize_logic(HardwareMap hardwareMap, Telemetry telemetry) {
+        initialize_hardware(hardwareMap, telemetry);
+
+        dc_times_started = new double[dc_motor_names.size()]; //in seconds
+        dc_target_positions = new double[dc_motor_names.size()];
+        error = new double[dc_motor_names.size()][2]; //1st is previous, 2nd is current
+
+        servo_times_started = new double[servo_names.size()];
+        servo_target_positions = new double[servo_names.size()];
+
+        cr_times_started = new double[cr_servo_names.size()];
     }
 
     public void tick(Gamepad gamepad1, Gamepad gamepad2) {

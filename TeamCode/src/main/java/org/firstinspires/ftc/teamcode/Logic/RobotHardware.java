@@ -27,19 +27,30 @@ public class RobotHardware extends Robots {
     public HardwareMap map;
     public Telemetry telemetry;
 
-    public DcMotor[] wheel_list = new DcMotor[wheel_names.size()];
-    public DcMotor[] dc_motor_list = new DcMotor[dc_motor_names.size()];
-    public Servo[] servo_list = new Servo[servo_names.size()];
-    public CRServo[] cr_servo_list = new CRServo[cr_servo_names.size()];
+    public DcMotor[] wheel_list;
+    public DcMotor[] dc_motor_list;
+    public Servo[] servo_list;
+    public CRServo[] cr_servo_list;
 
-    public DistanceSensor[] distance_sensor_list = new DistanceSensor[distance_sensor_names.size()];
-    public TouchSensor[] touch_sensor_list = new TouchSensor[touch_sensor_names.size()];
-    public ColorSensor[] color_sensor_list = new ColorSensor[color_sensor_names.size()];
-    public RevBlinkinLedDriver[] led_list = new RevBlinkinLedDriver[led_names.size()];
+    public DistanceSensor[] distance_sensor_list;
+    public TouchSensor[] touch_sensor_list;
+    public ColorSensor[] color_sensor_list;
+    public RevBlinkinLedDriver[] led_list;
 
     double imu_zero;
 
     public void initialize_hardware(HardwareMap hardwareMap, Telemetry telemetry) {
+
+        wheel_list = new DcMotor[wheel_names.size()];
+        dc_motor_list = new DcMotor[dc_motor_names.size()];
+        servo_list = new Servo[servo_names.size()];
+        cr_servo_list = new CRServo[cr_servo_names.size()];
+
+        distance_sensor_list = new DistanceSensor[distance_sensor_names.size()];
+        touch_sensor_list = new TouchSensor[touch_sensor_names.size()];
+        color_sensor_list = new ColorSensor[color_sensor_names.size()];
+        led_list = new RevBlinkinLedDriver[led_names.size()];
+
         this.telemetry = telemetry;
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();

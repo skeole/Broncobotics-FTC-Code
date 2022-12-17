@@ -47,7 +47,7 @@ class TeleOp201Logic extends TeleOpLogicBase {
 
     public void init(HardwareMap hm, Telemetry tm) {
         init201();
-        initialize_hardware(hm, tm);
+        initialize_logic(hm, tm);
         setZeroAngle(0);
         rightMotor = map.get(DcMotor.class, "Right");
         rightMotor.setDirection(DcMotor.Direction.REVERSE);
