@@ -113,23 +113,6 @@ public class RobotHardware extends Robots {
         return (angles.firstAngle - imu_zero) * (invertIMU ? -1 : 1);
     }
 
-    public void turnDegree(double degrees) {
-        double startingAngle = getAngle();
-
-        double targetHeading = startingAngle + degrees;
-        while (targetHeading < 0 || targetHeading >= 360) {
-            targetHeading += 360 * (targetHeading < 0 ? 1 : -1);
-        }
-
-        int factor = (((0 < targetHeading - startingAngle) && (targetHeading - startingAngle < 180)) || (targetHeading - startingAngle < -180) ? 1 : -1);
-        for (int i = 0; i < wheel_list.length; i++) wheel_list[i].setPower((i < 2 ? -0.5 : 0.5) * factor);
-
-        while ((getAngle() - targetHeading) * (getAngle() - targetHeading) < 25) {
-            //wait
-        }
-        for (int i = 0; i < wheel_list.length; i++) wheel_list[i].setPower(0);
-    }
-
     //Voltage
     public double getBatteryVoltage() {
         double result = Double.POSITIVE_INFINITY;
@@ -140,21 +123,6 @@ public class RobotHardware extends Robots {
             }
         }
         return result;
-    }
-
-    //DC Motors
-    public void setPower(String name, double power) {
-        dc_motor_list[dc_motor_names.indexOf(name)].setPower(power);
-    }
-
-    public void resetEncoder(String name) {
-        dc_motor_list[dc_motor_names.indexOf(name)].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        dc_motor_list[dc_motor_names.indexOf(name)].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-    }
-
-    //Servos
-    public void setPosition(String name, double position) {
-        servo_list[servo_names.indexOf(name)].setPosition(position);
     }
 
     //Distance Sensor
@@ -180,44 +148,38 @@ public class RobotHardware extends Robots {
     //LED
     public void setLed(String name, String pattern) {
         RevBlinkinLedDriver.BlinkinPattern convertedPattern = RevBlinkinLedDriver.BlinkinPattern.WHITE;
-        switch(pattern){
-            case "Rainbow":
+        switch (pattern.toLowerCase()) {
+            case "rainbow":
                 convertedPattern = RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE;
                 break;
-            case "Red":
+            case "red":
                 convertedPattern = RevBlinkinLedDriver.BlinkinPattern.RED;
                 break;
-            case "Orange":
+            case "orange":
                 convertedPattern = RevBlinkinLedDriver.BlinkinPattern.ORANGE;
                 break;
-            case "Yellow":
+            case "yellow":
                 convertedPattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
                 break;
-            case "Green":
+            case "green":
                 convertedPattern = RevBlinkinLedDriver.BlinkinPattern.GREEN;
                 break;
-            case "Blue":
+            case "blue":
                 convertedPattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
                 break;
-            case "Violet":
+            case "violet":
                 convertedPattern = RevBlinkinLedDriver.BlinkinPattern.VIOLET;
                 break;
-            case "White":
+            case "purple":
+                convertedPattern = RevBlinkinLedDriver.BlinkinPattern.VIOLET;
+                break;
+            case "white":
                 convertedPattern = RevBlinkinLedDriver.BlinkinPattern.WHITE;
                 break;
-            case "Black":
+            case "black":
                 convertedPattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
                 break;
         }
         led_list[led_names.indexOf(name)].setPattern(convertedPattern);
-    }
-
-    public void stop() {
-        for (DcMotor motor : dc_motor_list) {
-            motor.setPower(0);
-        }
-        for (DcMotor motor : wheel_list) {
-            motor.setPower(0);
-        }
     }
 }

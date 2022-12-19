@@ -38,6 +38,7 @@ public class Robots {
         strafe = -0.8;
         turning_weight = -1.0;
         distance_weight = -1.0;
+        max_speed = 0.5;
 
         locked_motion = false;
         locked_rotation = false;
@@ -102,9 +103,10 @@ public class Robots {
 
         led_names = new ArrayList<>(Arrays.asList());
 
-        strafe = 0.0;
+        strafe = 1.0;
         turning_weight = 1.0;
         distance_weight = 1.0;
+        max_speed = 0.0;
 
         locked_motion = true;
         locked_rotation = false;
@@ -158,7 +160,7 @@ public class Robots {
     public ArrayList<String> led_names;
 
     //Driving
-    public double strafe; public double turning_weight; public double distance_weight;
+    public double strafe; public double turning_weight; public double distance_weight; public double max_speed;
     public boolean locked_motion; public boolean locked_rotation;
 
     //PID
@@ -234,6 +236,7 @@ public class Robots {
         strafe = 1.0;
         turning_weight = 1.0;
         distance_weight = 1.0;
+        max_speed = 1.0;
 
         locked_motion = false;
         locked_rotation = false;
@@ -296,6 +299,7 @@ public class Robots {
         strafe = 1.0;
         turning_weight = 1.0;
         distance_weight = 1.0;
+        max_speed = 0.0;
 
         locked_motion = false;
         locked_rotation = false;

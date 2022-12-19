@@ -17,7 +17,6 @@ public class Tensorflow {
     private VuforiaLocalizer vuforia;
     private TFObjectDetector tfod;
     private HardwareMap hardwareMap;
-    private double zoom;
 
     private final float min_confidence;
     private final int input_size;
