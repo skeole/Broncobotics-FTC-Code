@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Logic.RoadRunner.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.Logic.TeleOpLogicBase;
+import static org.firstinspires.ftc.teamcode.Robots.*;
 
 class DriverPracticeLogic extends TeleOpLogicBase {
 
@@ -49,6 +50,8 @@ class DriverPracticeLogic extends TeleOpLogicBase {
         init_base();
         initialize_logic(hm, tm);
         setZeroAngle(0);
+        set_keybinds();
+        set_button_types();
         button_types[keys.indexOf("driver a")] = 3; //1 = default, 2 = toggle, 3 = button
     }
 
@@ -58,12 +61,6 @@ class DriverPracticeLogic extends TeleOpLogicBase {
 
     public void set_keybinds() {
 
-    }
-
-    public DriverPracticeLogic() {
-        super();
-        set_keybinds();
-        set_button_types();
     }
 }
 
@@ -75,7 +72,7 @@ public class DriverPractice extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         logic.init(hardwareMap, telemetry);
         waitForStart();
-        if (logic.useRoadRunner) {
+        if (useRoadRunner) {
             logic.initRoadRunner(new StandardTrackingWheelLocalizer(hardwareMap, logic));
         }
         while (opModeIsActive()) {

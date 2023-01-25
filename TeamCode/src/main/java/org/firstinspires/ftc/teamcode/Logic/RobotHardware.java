@@ -22,24 +22,25 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.Robots;
 
 public class RobotHardware extends Robots {
-    public BNO055IMU imu;
 
-    public HardwareMap map;
-    public Telemetry telemetry;
+    public static BNO055IMU imu;
 
-    public DcMotor[] wheel_list;
-    public DcMotor[] dc_motor_list;
-    public Servo[] servo_list;
-    public CRServo[] cr_servo_list;
+    public static HardwareMap map;
+    public static Telemetry telemetry;
 
-    public DistanceSensor[] distance_sensor_list;
-    public TouchSensor[] touch_sensor_list;
-    public ColorSensor[] color_sensor_list;
-    public RevBlinkinLedDriver[] led_list;
+    public static DcMotor[] wheel_list;
+    public static DcMotor[] dc_motor_list;
+    public static Servo[] servo_list;
+    public static CRServo[] cr_servo_list;
 
-    double imu_zero;
+    public static DistanceSensor[] distance_sensor_list;
+    public static TouchSensor[] touch_sensor_list;
+    public static ColorSensor[] color_sensor_list;
+    public static RevBlinkinLedDriver[] led_list;
 
-    public void initialize_hardware(HardwareMap hardwareMap, Telemetry telemetry) {
+    public static double imu_zero;
+
+    public static void initialize_hardware(HardwareMap hardwareMap, Telemetry telemetry_) {
 
         wheel_list = new DcMotor[wheel_names.size()];
         dc_motor_list = new DcMotor[dc_motor_names.size()];
@@ -51,21 +52,23 @@ public class RobotHardware extends Robots {
         color_sensor_list = new ColorSensor[color_sensor_names.size()];
         led_list = new RevBlinkinLedDriver[led_names.size()];
 
-        this.telemetry = telemetry;
+        telemetry = telemetry_;
 
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.mode = BNO055IMU.SensorMode.IMU;
-        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled = true;
-        parameters.loggingTag = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        if (use_IMU) {
+            BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+            parameters.mode = BNO055IMU.SensorMode.IMU;
+            parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+            parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+            parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+            parameters.loggingEnabled = true;
+            parameters.loggingTag = "IMU";
+            parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
+            imu = hardwareMap.get(BNO055IMU.class, "imu");
+            imu.initialize(parameters);
 
-        imu_zero = imu.getAngularOrientation(AxesReference.INTRINSIC, axesOrder, AngleUnit.RADIANS).firstAngle;
+            imu_zero = imu.getAngularOrientation(AxesReference.INTRINSIC, axesOrder, AngleUnit.RADIANS).firstAngle;
+        }
 
         for (int i = 0; i < wheel_list.length; i++) {
             wheel_list[i] = hardwareMap.get(DcMotor.class, wheel_names.get(i));
@@ -104,17 +107,20 @@ public class RobotHardware extends Robots {
         telemetry.addData("Robot Hardware", "Initialized");
         telemetry.update();
 
-        this.map = hardwareMap;
+        map = hardwareMap;
     }
 
     //IMU Stuff
-    public double getAngle() {
-        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, axesOrder, AngleUnit.RADIANS);
-        return (angles.firstAngle - imu_zero) * (invertIMU ? -1 : 1);
+    public static double getAngle() {
+        if (use_IMU) {
+            Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, axesOrder, AngleUnit.RADIANS);
+            return (angles.firstAngle - imu_zero) * (invertIMU ? -1 : 1);
+        }
+        return 0;
     }
 
     //Voltage
-    public double getBatteryVoltage() {
+    public static double getBatteryVoltage() {
         double result = Double.POSITIVE_INFINITY;
         for (VoltageSensor sensor : map.voltageSensor) {
             double voltage = sensor.getVoltage();
@@ -126,17 +132,17 @@ public class RobotHardware extends Robots {
     }
 
     //Distance Sensor
-    public double getDistInch(String name){
+    public static double getDistInch(String name){
         return distance_sensor_list[distance_sensor_names.indexOf(name)].getDistance(DistanceUnit.INCH);
     }
 
     //Touch Sensor
-    public boolean touchSensorTouching(String name) {
+    public static boolean touchSensorTouching(String name) {
         return touch_sensor_list[touch_sensor_names.indexOf(name)].isPressed();
     }
 
     //Color Sensor
-    public int[] getRGBA(String name) {
+    public static int[] getRGBA(String name) {
         return new int[] {
                 color_sensor_list[color_sensor_names.indexOf(name)].red(),
                 color_sensor_list[color_sensor_names.indexOf(name)].green(),
@@ -146,7 +152,7 @@ public class RobotHardware extends Robots {
     }
 
     //LED
-    public void setLed(String name, String pattern) {
+    public static void setLed(String name, String pattern) {
         RevBlinkinLedDriver.BlinkinPattern convertedPattern = RevBlinkinLedDriver.BlinkinPattern.WHITE;
         switch (pattern.toLowerCase()) {
             case "rainbow":

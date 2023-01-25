@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Logic.AutonomousLogic;
 
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Logic.RobotHardware;
@@ -9,8 +10,8 @@ public class ThreadedServo extends Thread {
     Servo servo;
     double target_position;
 
-    public ThreadedServo(RobotHardware rh, String servo_name) {
-        servo = rh.map.get(Servo.class, servo_name);
+    public ThreadedServo(HardwareMap map, String servo_name) {
+        servo = map.get(Servo.class, servo_name);
     }
 
     public void set_position(double p) {

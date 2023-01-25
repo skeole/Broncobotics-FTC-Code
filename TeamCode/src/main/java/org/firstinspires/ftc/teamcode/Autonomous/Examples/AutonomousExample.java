@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.Logic.RoadRunner.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.Logic.AutonomousLogic.*;
 import org.firstinspires.ftc.teamcode.Logic.*;
+import org.firstinspires.ftc.teamcode.Robots;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,32 +26,32 @@ class Auton extends Thread {
 
     public boolean isRunning = true;
 
-    public void run() { //MAIN FUNCTION
+    public void run() { // MAIN FUNCTION
         robot = new PositionControl(stwl, 80.0, 70.0, 270.0);
         telem = new UpdatingTelemetry(alb, stwl, tf);
 
-        motor1 = new ThreadedMotor(alb, "motor name");
-        servo1 = new ThreadedServo(alb, "servo name");
+        motor1 = new ThreadedMotor(RobotHardware.map, "motor name");
+        servo1 = new ThreadedServo(RobotHardware.map, "servo name");
 
         motor1.start();
         servo1.start();
         telem.start();
 
-        robot.turn(90.00); //Should turn 90 degrees right
-        robot.moveForward(100.0); //Should move 100 degrees forward
-        robot.strafe(-100.0); //Should move 100 degrees Left
+        robot.turn(90.00); // Should turn 90 degrees right
+        robot.moveForward(100.0); // Should move 100 degrees forward
+        robot.strafe(-100.0); // Should move 100 degrees Left
 
         telem.add_element_to_telemetry("this", "is how you add data to telemetry");
 
-        pause(3000); //suspend reading of code
+        pause(3000); // suspend reading of code
 
-        telem.remove("this"); //is how you remove data from the telemetry
+        telem.remove("this"); // is how you remove data from the telemetry
         telem.show_tensor = false;
         telem.add_element_to_telemetry("no longer showing", "tensorflow data");
 
         motor1.set_position(300);
         servo1.set_position(0.5);
-        alb.setPower("motor 2", 0.3);
+        AutonomousLogicBase.setPower("motor 2", 0.3);
 
         waitFor(motor1); //waits for motor1 to finish
 
@@ -61,7 +62,7 @@ class Auton extends Thread {
         motor1.should_be_running = false;
         servo1.should_be_running = false;
         telem.should_be_running = false;
-        alb.stop();
+        AutonomousLogicBase.stop();
     }
 
     public Auton(AutonomousLogicBase r) {
@@ -106,8 +107,8 @@ public class AutonomousExample extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        r.init201();
-        r.initialize_hardware(hardwareMap, telemetry);
+        Robots.init_base();
+        RobotHardware.initialize_hardware(hardwareMap, telemetry);
         l = new StandardTrackingWheelLocalizer(hardwareMap, r);
         t = new Tensorflow(r);
 
@@ -153,21 +154,21 @@ class UpdatingTelemetry extends Thread {
         while (should_be_running) {
             localizer.update();
             currentPose = localizer.getPoseEstimate();
-            robot.telemetry.clear();
+            telemetry.clear();
             if (show_position) {
-                robot.telemetry.addData("x", currentPose.getX());
-                robot.telemetry.addData("y", currentPose.getY());
-                robot.telemetry.addData("angle", currentPose.getHeading());
+                RobotHardware.telemetry.addData("x", currentPose.getX());
+                RobotHardware.telemetry.addData("y", currentPose.getY());
+                RobotHardware.telemetry.addData("angle", currentPose.getHeading());
             }
             if (show_tensor) {
                 for (String data : tensorflow.getData()) {
-                    robot.telemetry.addData("tensorflow detects", data);
+                    RobotHardware.telemetry.addData("tensorflow detects", data);
                 }
             }
             for (Map.Entry<String, String> telem_elem : telemetry.entrySet()) {
-                robot.telemetry.addData(telem_elem.getKey(), telem_elem.getValue());
+                RobotHardware.telemetry.addData(telem_elem.getKey(), telem_elem.getValue());
             }
-            robot.telemetry.update();
+            RobotHardware.telemetry.update();
             pause(10);
         }
     }

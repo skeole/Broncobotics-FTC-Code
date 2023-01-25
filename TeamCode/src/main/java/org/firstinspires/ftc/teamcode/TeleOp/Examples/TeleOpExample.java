@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Logic.RoadRunner.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.Logic.TeleOpLogicBase;
-
+import static org.firstinspires.ftc.teamcode.Robots.*;
 
 class TeleOpExampleLogic extends TeleOpLogicBase { //You have to change the class name here
 
@@ -56,9 +56,14 @@ class TeleOpExampleLogic extends TeleOpLogicBase { //You have to change the clas
     //Initialization
 
     public void init(HardwareMap hm, Telemetry tm) {
-        starting_time = System.nanoTime() / 1000000000.0;
         init_base();
+        starting_time = System.nanoTime() / 1000000000.0;
         initialize_logic(hm, tm);
+        setZeroAngle(-90); //Relative to Driver, Positive = Clockwise
+        //ex. if robot facing left, then starting angle = -90
+        //target_positions[dc_motor_names.size() + servo_names.indexOf("right")] = 1.0;
+        set_keybinds();
+        set_button_types();
         setZeroAngle(-90); //Relative to Driver, Positive = Clockwise
         //ex. if robot facing left, then starting angle = -90
         //target_positions[dc_motor_names.size() + servo_names.indexOf("right")] = 1.0;
@@ -121,12 +126,6 @@ class TeleOpExampleLogic extends TeleOpLogicBase { //You have to change the clas
         * can change button functions freely - toggle, button, default and all their parameters
         * not all buttons have to be used
      */
-
-    public TeleOpExampleLogic() { //You have to change this
-        super();
-        set_keybinds();
-        set_button_types();
-    }
 }
 
 @TeleOp(name="TeleOp Example", group="Iterative Opmode") //CHANGE THIS
@@ -136,7 +135,7 @@ public class TeleOpExample extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         logic.init(hardwareMap, telemetry);
         waitForStart();
-        if (logic.useRoadRunner) {
+        if (useRoadRunner) {
             logic.initRoadRunner(new StandardTrackingWheelLocalizer(hardwareMap, logic));
         }
         while (opModeIsActive()) {

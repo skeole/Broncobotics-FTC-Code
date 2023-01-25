@@ -4,126 +4,71 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Logic.RoadRunner.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.Logic.TeleOpLogicBase;
+import static org.firstinspires.ftc.teamcode.Robots.*;
 
 class TeleOp202Logic extends TeleOpLogicBase {
 
-    public double starting_time;
+    public static double starting_time;
 
-    double tx = 2.0;
-    double ty = 0.0;
+    public static final double x = 1, max_y = Math.sqrt(4 - x * x) - 0.05, lift_speed = 1.3;
+    public static double y = 0; // starting y value
 
-    boolean clawOpen = false;
+    public final static double
+            first_arm_zero =     410,
+            second_arm_zero =    -817;
 
-    static double CLAW_OPEN = 1;
-    static double CLAW_CLOSE = 0;
+    // Encoder Values at straight ahead:
+        //410
+        //-817
 
-    double CLAW_ALIGNER_INCREMENTER = 10;
+    public static final double ticks_per_radian = 2786.2109868741 / 2.0 / Math.PI; // 2786.2109868741 ticks per revolution
 
-    double z1 = Math.PI / 180.0 * 5;
-    double z2 = Math.PI / 180.0 * 354;
+    public static DcMotor left_motor = null;
 
-    double tpr = 2786.2109868741 / 2.0 / Math.PI;
-
-    DcMotor dc = null;
-
-    public void execute_non_driver_controlled() {
-
-        double xbefore = tx;
-        double ybefore = ty;
+    public static void execute_non_driver_controlled() {
 
         if (buttons[4])
-            ty += delta_time * 2;
+            y += delta_time * lift_speed;
         if (buttons[5])
-            ty -= delta_time * 2;
-        if (buttons[7])
-            tx += delta_time * 2;
-        if (buttons[6])
-            tx -= delta_time * 2;
-        if (buttons[9]) {
-            clawOpen = true;
-            servo_target_positions[3] = CLAW_OPEN;
-        }
-        if (buttons[8]) {
-            clawOpen = false;
-            servo_target_positions[3] = CLAW_CLOSE;
-        }
+            y -= delta_time * lift_speed;
 
-        ty += axes[2] * CLAW_ALIGNER_INCREMENTER * delta_time;
-        tx += axes[0] * CLAW_ALIGNER_INCREMENTER * delta_time;
+        y = Math.max(Math.min(y, max_y), 0 - max_y);
 
-        if (ty < Math.sqrt(3)) {
-            tx = 1;
-            if (ty < -1.2) ty = -1.2;
-        } else {
-            tx = Math.sqrt(4 - ty * ty);
-        }
+        double magnitude = Math.sqrt(x * x + y * y);
 
-        if (tx <= 0.001) tx = 0.001;
+        double temp_angle = Math.atan(y / x);
+        double secondary_angle = Math.acos(magnitude / 2);
+        double primary_angle = Math.PI - 2 * secondary_angle;
 
-        if (buttons[3]) {
-            tx = 1;
-            ty = 1.7;
-        }
-
-        if (buttons[2]) {
-            ty = -1.2;
-            tx = 1.2;
-        }
-        if (buttons[0]) {
-            ty = 1.8;
-            tx = 0.8;
-        }
-        if (ty >= 2) ty = 2;
-        if (tx >= 2) tx = 2;
-        if (ty < -1.2) ty = -1.2;
-        if (tx < 0.5) tx = 0.5;
-        double magnitude = Math.sqrt(tx * tx + ty * ty);
-
-        if (magnitude > 2) {
-            double ong = 1.995 / magnitude;
-            double ratio = ong;
-            tx *= ratio;
-            ty *= ong;
-            magnitude = Math.sqrt(tx * tx + ty * ty);
-        }
-
-        double tangle2 = Math.acos(1 - magnitude * magnitude / 2.0); //180 means straight line
-        double tangle1 = Math.PI + Math.atan(ty / tx) - tangle2 / 2.0; //0 means straight down
-        double tangle3 = Math.PI / 2.0 - tangle2 - tangle1;
-
+        double target_angle_one = temp_angle + secondary_angle;
+        double target_angle_two = target_angle_one + primary_angle - Math.PI;
+        double target_angle_three = 0 - target_angle_two;
         // removing the initial angle
-        tangle1 -= z1;
-        tangle2 -= z2;
 
-        // converting to encoder ticks
-        tangle1 *= tpr;
-        tangle2 *= tpr;
+        target_angle_one *= ticks_per_radian;
+        target_angle_two *= ticks_per_radian;
 
-        dc_target_positions[0] = 0 - tangle1; //ticks per radian
-        dc.setPower(dc_motor_list[0].getPower());
+        target_angle_three *= 180.0 / Math.PI; // angle
+            // 300 is the maximum angle --> 5/6 pi --> sets target angle to 1
 
+        target_angle_one += first_arm_zero;
+        target_angle_two += second_arm_zero;
+        target_angle_three = target_angle_three * 0.00334 + 0.33577; // very good guessing ig
 
-        dc_target_positions[1] = tangle2;
+        dc_target_positions[0] = target_angle_one;
+        left_motor.setPower(dc_motor_list[0].getPower());
 
-        if (axes[4] > 0.1) {
-            servo_target_positions[0]+= axes[4] * CLAW_ALIGNER_INCREMENTER;
-        }
-        if (axes[5] > 0.1) {
-            servo_target_positions[0]-= axes[5] * CLAW_ALIGNER_INCREMENTER;
-        }
+        dc_target_positions[1] = target_angle_two;
 
-        telemetry.addData("Angle?", getAngle());
-        telemetry.addData("Angle V2", current_angle = 0 - getAngle() - zero_angle); //Only different value if not starting robot straight ahead
+        servo_target_positions[0] = target_angle_three;
+        telemetry.addData("position", servo_list[0].getPosition());
 
-        telemetry.addData("cycles per second", 0.1 * ((int) (10 / delta_time)));
-        telemetry.addData("elapsed time", 0.1 * ((int) (10.0 * (starting_time - current_time))));
-
-        telemetry.update();
+        // telemetry.addData("cycles per second", 0.1 * ((int) (10 / delta_time)));
+        // telemetry.addData("elapsed time", 0.1 * ((int) (0.5 + 10.0 * (current_time - starting_time))));
 
         telemetry.update();
         if (useRoadRunner) {
@@ -133,25 +78,32 @@ class TeleOp202Logic extends TeleOpLogicBase {
 
     //Initialization
 
-    public void init(HardwareMap hm, Telemetry tm) {
+    public static void init(HardwareMap hm, Telemetry tm) {
         starting_time = System.nanoTime() / 1000000000.0;
         init202();
         initialize_logic(hm, tm);
-        dc = map.get(DcMotor.class, "joint1left");
         setZeroAngle(0);
+        set_keybinds();
+        set_button_types();
+        left_motor = map.get(DcMotor.class, "joint1left");
+        left_motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        left_motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        left_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        servo_target_positions[0] = 0.6;
     }
 
-    public void initRoadRunner(StandardTrackingWheelLocalizer localizer) {
+    public static void initRoadRunner(StandardTrackingWheelLocalizer localizer) {
         initializeRoadRunner(45, 100, 0, localizer);
     }
 
-    public void set_keybinds() {
-    }
+    public static void set_keybinds() {
 
-    public TeleOp202Logic() {
-        super();
-        set_keybinds();
-        set_button_types();
+        new_keybind("clawAligner", "operator right_stick_y", "default", 0.3, 0.3);
+        //new_keybind("claw", "operator right_trigger", "default", 0.66, 0.66);
+        //new_keybind("claw", "operator dpad_left", "default", "gradient", -0.66);
+
+        // TODO: Figure out why operator left_trigger isn't working for this >:(
+
     }
 }
 
@@ -162,7 +114,7 @@ public class TeleOp202 extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         logic.init(hardwareMap, telemetry);
         waitForStart();
-        if (logic.useRoadRunner) {
+        if (useRoadRunner) {
             logic.initRoadRunner(new StandardTrackingWheelLocalizer(hardwareMap, logic));
         }
         while (opModeIsActive()) {

@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Logic.RoadRunner.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.Logic.TeleOpLogicBase;
+import static org.firstinspires.ftc.teamcode.Robots.*;
 
 class TeleOp201TestingLogic extends TeleOpLogicBase {
 
@@ -49,6 +50,8 @@ class TeleOp201TestingLogic extends TeleOpLogicBase {
         init201();
         initialize_logic(hm, tm);
         setZeroAngle(0);
+        set_keybinds();
+        set_button_types();
         rightMotor = map.get(DcMotor.class, "Right");
         rightMotor.setDirection(DcMotor.Direction.REVERSE);
         claw = map.get(Servo.class, "Scissor");
@@ -67,12 +70,6 @@ class TeleOp201TestingLogic extends TeleOpLogicBase {
         // V4B
         new_keybind("Virtual", "operator right_stick_y", "default", 1.0, 1.0);
     }
-
-    public TeleOp201TestingLogic() {
-        super();
-        set_keybinds();
-        set_button_types();
-    }
 }
 
 @TeleOp(name="TeleOp 201 Testing", group="Iterative Opmode")
@@ -82,7 +79,7 @@ public class TeleOp201Testing extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         logic.init(hardwareMap, telemetry);
         waitForStart();
-        if (logic.useRoadRunner) {
+        if (useRoadRunner) {
             logic.initRoadRunner(new StandardTrackingWheelLocalizer(hardwareMap, logic));
         }
         while (opModeIsActive()) {

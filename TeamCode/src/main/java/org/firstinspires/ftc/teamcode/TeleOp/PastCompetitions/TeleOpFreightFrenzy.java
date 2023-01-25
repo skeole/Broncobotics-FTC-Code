@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Logic.RoadRunner.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.Logic.TeleOpLogicBase;
+import static org.firstinspires.ftc.teamcode.Robots.*;
 
 class TeleOpFreightFrenzyLogic extends TeleOpLogicBase { //You have to change the class name here
 
@@ -51,9 +52,9 @@ class TeleOpFreightFrenzyLogic extends TeleOpLogicBase { //You have to change th
     public void init(HardwareMap hm, Telemetry tm) {
         init201();
         initialize_logic(hm, tm);
-        setZeroAngle(-90); //Relative to Driver, Positive = Clockwise
-        //ex. if robot facing left, then starting angle = -90
-        //target_positions[dc_motor_names.size() + servo_names.indexOf("right")] = 1.0;
+        setZeroAngle(-90);
+        set_keybinds();
+        set_button_types();
         button_types[keys.indexOf("operator a")] = 3; //1 is default, 2 is toggle, 3 is button
     }
 
@@ -114,11 +115,6 @@ class TeleOpFreightFrenzyLogic extends TeleOpLogicBase { //You have to change th
         * not all buttons have to be used
      */
 
-    public TeleOpFreightFrenzyLogic() { //You have to change this
-        super();
-        set_keybinds();
-        set_button_types();
-    }
 }
 
 @TeleOp(name="TeleOp Freight Frenzy", group="Iterative Opmode") //CHANGE THIS
@@ -128,7 +124,7 @@ public class TeleOpFreightFrenzy extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         logic.init(hardwareMap, telemetry);
         waitForStart();
-        if (logic.useRoadRunner) {
+        if (useRoadRunner) {
             logic.initRoadRunner(new StandardTrackingWheelLocalizer(hardwareMap, logic));
         }
         while (opModeIsActive()) {
