@@ -11,7 +11,7 @@ import static org.firstinspires.ftc.teamcode.Robots.*;
 
 class TeleOpFreightFrenzyLogic extends TeleOpLogicBase { //You have to change the class name here
 
-    public void execute_non_driver_controlled() {
+    public static void execute_non_driver_controlled() {
         //this will have the telemetry, LEDs, etc.
 
         //Telemetry
@@ -49,7 +49,7 @@ class TeleOpFreightFrenzyLogic extends TeleOpLogicBase { //You have to change th
 
     //Initialization
 
-    public void init(HardwareMap hm, Telemetry tm) {
+    public static void init(HardwareMap hm, Telemetry tm) {
         init201();
         initialize_logic(hm, tm);
         setZeroAngle(-90);
@@ -58,12 +58,12 @@ class TeleOpFreightFrenzyLogic extends TeleOpLogicBase { //You have to change th
         button_types[keys.indexOf("operator a")] = 3; //1 is default, 2 is toggle, 3 is button
     }
 
-    public void initRoadRunner(StandardTrackingWheelLocalizer localizer) {
+    public static void initRoadRunner(StandardTrackingWheelLocalizer localizer) {
         initializeRoadRunner(45, 100, 90, localizer);
         //Direction Robot is facing; if facing left, then it is either -90° or 90°
     }
 
-    public void set_keybinds() {
+    public static void set_keybinds() {
 
         //arm
 

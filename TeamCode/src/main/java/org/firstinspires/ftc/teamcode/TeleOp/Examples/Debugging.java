@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.Logic.RoadRunner.StandardTrackingWheelLoca
 import org.firstinspires.ftc.teamcode.Logic.TeleOpLogicBase;
 import static org.firstinspires.ftc.teamcode.Robots.*;
 
-class DriverPracticeLogic extends TeleOpLogicBase {
+class DebuggingLogic extends TeleOpLogicBase {
 
     public static double starting_time;
 
@@ -33,10 +33,24 @@ class DriverPracticeLogic extends TeleOpLogicBase {
         telemetry.addData("cycles per second", 0.1 * ((int) (10 / delta_time)));
         telemetry.addData("elapsed time", 0.1 * ((int) (10.0 * (starting_time - current_time))));
 
+        for (int i = 0; i < dc_motor_list.length; i++) {
+            telemetry.addData(dc_motor_names.get(i), dc_motor_list[i].getCurrentPosition());
+        }
 
-        if (buttons[keys.indexOf("driver a")]) {
-            telemetry.addData("resetting", "imu angle");
-            resetZeroAngle();
+        telemetry.addLine();
+
+        for (int i = 0; i < servo_list.length; i++) {
+            telemetry.addData(servo_names.get(i), servo_list[i].getPosition());
+        }
+
+        telemetry.addLine();
+
+        for (int i = 0; i < keys.size(); i++) {
+            if ((i < 20) && buttons[i]) {
+                telemetry.addData(keys.get(i), "is pressed");
+            } else if ((i > 19) && Math.abs(axes[i - 20]) > 0.1) {
+                telemetry.addData(keys.get(i) + " value", axes[i - 20]);
+            }
         }
 
         telemetry.update();
@@ -52,7 +66,6 @@ class DriverPracticeLogic extends TeleOpLogicBase {
         setZeroAngle(0);
         set_keybinds();
         set_button_types();
-        button_types[keys.indexOf("driver a")] = 3; //1 = default, 2 = toggle, 3 = button
     }
 
     public static void initRoadRunner(StandardTrackingWheelLocalizer localizer) {
@@ -64,9 +77,9 @@ class DriverPracticeLogic extends TeleOpLogicBase {
     }
 }
 
-@TeleOp(name="Driver Practice", group="Iterative Opmode")
-public class DriverPractice extends LinearOpMode {
-    DriverPracticeLogic logic = new DriverPracticeLogic();
+@TeleOp(name="Debugging", group="Iterative Opmode")
+public class Debugging extends LinearOpMode {
+    DebuggingLogic logic = new DebuggingLogic();
     StandardTrackingWheelLocalizer localizer;
     @Override
     public void runOpMode() throws InterruptedException {
@@ -76,7 +89,6 @@ public class DriverPractice extends LinearOpMode {
             logic.initRoadRunner(new StandardTrackingWheelLocalizer(hardwareMap, logic));
         }
         while (opModeIsActive()) {
-            logic.tick(gamepad1, gamepad2); //driver is gamepad1, operator is gamepad2
             logic.execute_non_driver_controlled();
         }
     }

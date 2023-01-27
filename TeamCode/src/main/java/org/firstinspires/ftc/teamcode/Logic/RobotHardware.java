@@ -92,8 +92,6 @@ public class RobotHardware extends Robots {
             dc_motor_list[i] = hardwareMap.get(DcMotor.class, dc_motor_names.get(i));
             dc_motor_list[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             dc_motor_list[i].setDirection(invert_dc_motors[i] ? DcMotor.Direction.REVERSE : DcMotor.Direction.FORWARD);
-            dc_motor_list[i].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            dc_motor_list[i].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
 
         for (int i = 0; i < servo_list.length; i++)

@@ -9,20 +9,21 @@ import org.firstinspires.ftc.teamcode.Logic.RobotHardware;
 @Autonomous(name = "PD Tuner")
 public class PIDTuner extends LinearOpMode {
 
-    RobotHardware robot = new RobotHardware();
-    StandardTrackingWheelLocalizer position_tracker;
+    public static RobotHardware robot = new RobotHardware();
+    public static StandardTrackingWheelLocalizer position_tracker;
 
-    double current_time = System.currentTimeMillis();
-    double previous_time = System.currentTimeMillis();
+    public static double current_time = System.currentTimeMillis();
+    public static double previous_time = System.currentTimeMillis();
 
-    double current_error = 0.0;
-    double previous_error = 0.0;
+    public static double current_error = 0.0;
+    public static double previous_error = 0.0;
 
-    double error = 0;
-    double target = Math.PI / 2.0;
+    public static double error = 0;
+    public static double target = Math.PI / 2.0;
 
     @Override
     public void runOpMode() throws InterruptedException {
+        robot.init201(); // change to whichever init you want to run
         robot.initialize_hardware(hardwareMap, telemetry);
         if (robot.useRoadRunner) {
             position_tracker = new StandardTrackingWheelLocalizer(hardwareMap, robot);
@@ -51,13 +52,13 @@ public class PIDTuner extends LinearOpMode {
         stop();
     }
 
-    public void turn(double speed) {
+    public static void turn(double speed) {
         for (int i = 0; i < 4; i++) {
             robot.wheel_list[i].setPower(speed * ((i > 1) ? -1 : 1));
         }
     }
 
-    public double getCorrection() {
+    public static double getCorrection() {
         current_time = System.currentTimeMillis();
         current_error = error;
 
@@ -70,7 +71,7 @@ public class PIDTuner extends LinearOpMode {
         return robot.p_weight * p + robot.d_weight * d;
     }
 
-    public double modulus(double value, double base) {
+    public static double modulus(double value, double base) {
         while (value >= base) {
             value -= base;
         }

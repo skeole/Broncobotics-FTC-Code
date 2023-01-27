@@ -14,9 +14,9 @@ import java.util.Map;
 
 public class TeleOpLogicBase extends RobotHardware {
     // run .init201() then .init()
-    private static double previous_time = System.nanoTime() / 1000000000.0;
-    public static double current_time = System.nanoTime() / 1000000000.0;
-    public static double delta_time = 0;
+    public static double previous_time = System.nanoTime() / 1000000000.0,
+            current_time = System.nanoTime() / 1000000000.0,
+            delta_time = 0;
 
     public static StandardTrackingWheelLocalizer position_tracker;
 
@@ -41,32 +41,34 @@ public class TeleOpLogicBase extends RobotHardware {
                 for modifier3: angle * 1000 (for angle to remain the same set angle to precisely 1 because ain't no way I set angle to 0.001)
          */
 
-    public static double[] dc_times_started; // in seconds
-    public static double[] dc_target_positions;
+    public static double[] dc_times_started, // in seconds
+                           dc_target_positions;
     public static double[][] error; // 1st is previous, 2nd is current
 
-    public static double[] servo_times_started;
-    public static double[] servo_target_positions;
+    public static double[] servo_times_started, servo_target_positions, cr_times_started;
 
-    public static double[] cr_times_started;
-
-    public static int[] button_types = new int[27]; // 1 = default, 2 = toggle, 3 = button
-    public static int[] key_values = new int[27]; // number of times button/axis is "activated"
+    public static int[] button_types = new int[27],  // 1 = default, 2 = toggle, 3 = button
+                        key_values = new int[27]; // number of times button/axis is "activated"
     public static boolean[] buttons = new boolean[20]; // value of button (True or False)
     public static double[] axes = new double[7]; // value of axis (1 for buttons/cycles, -1.0 to 1.0 for everything else)
 
-    public static double current_x = 0;
-    public static double current_y = 0;
-    public static double current_angle = 0;
+    public static double current_x = 0, current_y = 0, current_angle = 0;
 
-    public static double target_x = 0;
-    public static double target_y = 0;
-    public static double target_angle = 0;
+    public static double target_x = 0, target_y = 0, target_angle = 0;
 
     public static double zero_angle = 0;
 
-    public static double current_error;
-    public static double previous_error;
+    public static double current_error, previous_error;
+
+    public static boolean
+            operator_a, operator_b, operator_x, operator_y, operator_dpad_up,
+            operator_dpad_down, operator_dpad_left, operator_dpad_right, operator_left_bumper,
+            operator_right_bumper, driver_a, driver_b, driver_x, driver_y,
+            driver_dpad_dpad_up, driver_dpad_down, driver_dpad_left, driver_dpad_right,
+            driver_left_bumper, driver_right_bumper;
+    public static double operator_left_stick_x, operator_right_stick_x,
+            operator_left_stick_y, operator_right_stick_y, operator_left_trigger,
+            operator_right_trigger, driver_left_trigger;
 
     public static void initialize_logic(HardwareMap hardwareMap, Telemetry telemetry) {
         initialize_hardware(hardwareMap, telemetry);
@@ -120,6 +122,9 @@ public class TeleOpLogicBase extends RobotHardware {
             axis_value = key_values[axis_index] % 4 != 0 ? 1 : 0;
         } else if (button_types[axis_index] == 1) {
             axis_value = axis;
+            if (Math.abs(axis_value) < 0.1) {
+                axis_value = 0;
+            }
         } else {
             axis_value = (key_values[axis_index] % 2 == 0) && (Math.abs(axis) > 0.1) ? 1 : 0;
             key_values[axis_index] += ((Math.abs(axis) > 0.1) == (key_values[axis_index] % 2 == 0)) ? 1 : 0;
@@ -157,31 +162,68 @@ public class TeleOpLogicBase extends RobotHardware {
         update_axis(gamepad2.left_trigger, 24);
         update_axis(gamepad2.right_trigger, 25);
         update_axis(gamepad1.left_trigger, 26);
+
+        operator_a = buttons[0];
+        operator_b = buttons[1];
+        operator_x = buttons[2];
+        operator_y = buttons[3];
+        operator_dpad_up = buttons[4];
+        operator_dpad_down = buttons[5];
+        operator_dpad_left = buttons[6];
+        operator_dpad_right = buttons[7];
+        operator_left_bumper = buttons[8];
+        operator_right_bumper = buttons[9];
+
+        driver_a = buttons[10];
+        driver_b = buttons[11];
+        driver_x = buttons[12];
+        driver_y = buttons[13];
+        driver_dpad_dpad_up = buttons[14];
+        driver_dpad_down = buttons[15];
+        driver_dpad_left = buttons[16];
+        driver_dpad_right = buttons[17];
+        driver_left_bumper = buttons[18];
+        driver_right_bumper = buttons[19];
+
+        operator_left_stick_x = axes[0];
+        operator_right_stick_x = axes[1];
+        operator_left_stick_y = axes[2];
+        operator_right_stick_y = axes[3];
+        operator_left_trigger = axes[4];
+        operator_right_trigger = axes[5];
+        driver_left_trigger = axes[6];
     }
 
     public static void drive(Gamepad gamepad) {
+
+        double lsx = gamepad.left_stick_x;
+        double lsy = 0 - gamepad.left_stick_y;
+        double rsx = gamepad.right_stick_x;
+        double rsy = 0 - gamepad.right_stick_y;
+
         double speedFactor = 1 + 2 * gamepad.right_trigger;
 
-        double left_stick_magnitude = Math.sqrt(gamepad.left_stick_x * gamepad.left_stick_x + gamepad.left_stick_y * gamepad.left_stick_y);
-        if (left_stick_magnitude <= 0.333) left_stick_magnitude = 0.0;
-        double left_stick_angle =
-            (left_stick_magnitude <= 0.333) ? -Math.PI / 2.0 :
-            (gamepad.left_stick_x > 0) ? Math.atan(gamepad.left_stick_y / gamepad.left_stick_x) :
-            (gamepad.left_stick_x < 0) ? Math.PI + Math.atan(gamepad.left_stick_y / gamepad.left_stick_x) :
-            (gamepad.left_stick_y > 0) ? Math.PI / 2.0 : -Math.PI / 2.0;
-        left_stick_angle += Math.PI/2.0;
+        double left_stick_magnitude = magnitude(lsx, lsy);
+        if (left_stick_magnitude <= dead_zone) {
+            left_stick_magnitude = 0.0;
+            lsx = 0;
+            lsy = 0;
+        }
+        double left_stick_angle = vectorToAngle(lsx, lsy);
 
-        double right_stick_magnitude = Math.sqrt(gamepad.right_stick_x * gamepad.right_stick_x + gamepad.right_stick_y * gamepad.right_stick_y);
-        if (right_stick_magnitude <= 0.333) right_stick_magnitude = 0.0;
-        double right_stick_angle =
-            (right_stick_magnitude <= 0.333) ? -Math.PI / 2.0 :
-            (gamepad.right_stick_x > 0) ? Math.atan(gamepad.right_stick_y / gamepad.right_stick_x) :
-            (gamepad.right_stick_x < 0) ? Math.PI + Math.atan(gamepad.right_stick_y / gamepad.right_stick_x) :
-            (gamepad.right_stick_y > 0) ? Math.PI / 2.0 : -Math.PI / 2.0;
-        right_stick_angle += Math.PI/2.0;
+        double right_stick_magnitude = magnitude(rsx, rsy);
+        if (right_stick_magnitude <= dead_zone) {
+            right_stick_magnitude = 0.0;
+            rsx = 0;
+            rsy = 0;
+        }
+        double right_stick_angle = vectorToAngle(rsx, rsy);
 
-        left_stick_angle = modifiedAngle(left_stick_angle);
-        right_stick_angle = modifiedAngle(right_stick_angle);
+        if (drive_type != 0) {
+            double[] drive_data = weird_driving(lsx, lsy, rsx, lsy, gamepad);
+            drive(drive_data[0], drive_data[1], drive_data[2], drive_data[3]);
+            return;
+        }
 
         // Positive angles --> clockwise
         // Zero --> vertical
@@ -202,6 +244,7 @@ public class TeleOpLogicBase extends RobotHardware {
         double offset;
 
         if (left_stick_magnitude != 0) {
+
             distance_factor = left_stick_magnitude;
 
             if (locked_motion) {
@@ -217,14 +260,11 @@ public class TeleOpLogicBase extends RobotHardware {
 
         } else {
 
-            distance_factor = Math.sqrt((current_x - target_x) * (current_x - target_x) + (current_y - target_y) * (current_y - target_y)) * distance_weight_two;
+            distance_factor = magnitude(target_x - current_x, target_y - current_y) * distance_weight_two;
             // zero by default if not using RoadRunner :)
 
-            double line_angle = (target_x > current_x) ? Math.atan(((float) target_y - (float) current_y)/((float) target_x - (float) current_x)) :
-                (target_x < current_x) ? Math.PI + Math.atan(((float) target_y - (float) current_y)/((float) target_x - (float) current_x)) :
-                (target_y > current_y) ? Math.PI / 2.0 : -Math.PI / 2.0;
+            double line_angle = vectorToAngle(target_x - current_x, target_y - current_y);
 
-            line_angle += Math.PI / 2.0;
             offset = modifiedAngle(line_angle - current_angle);
         }
 
@@ -235,7 +275,7 @@ public class TeleOpLogicBase extends RobotHardware {
                 target_angle = right_stick_angle;
             } else { // if we're driving normally
                 target_angle = current_angle;
-                turning_factor = gamepad.right_stick_x;
+                turning_factor = rsx;
             }
         } // target angle remains constant if we aren't turning manually
 
@@ -429,11 +469,14 @@ public class TeleOpLogicBase extends RobotHardware {
                                         (key_index > 23) ? object_keys.get(i + 2) :
                                         (axes[key_index - 20] < 0 ? object_keys.get(i + 2) : object_keys.get(i + 3))
                                     );
-                                    telemetry.addData("idk", 0.01 * delta_time * (
-                                        (key_index > 23) ? object_keys.get(i + 2) :
-                                        (axes[key_index - 20] < 0 ? object_keys.get(i + 2) : object_keys.get(i + 3))));
+                                    telemetry.addData("servo", element.getKey());
+                                    telemetry.addData("List index", list_index);
+                                    telemetry.addData("Axis Val", axes[key_index - 20]);
+                                    telemetry.addData("Delta time", delta_time);
+                                    telemetry.addData("change", (key_index > 23) ? object_keys.get(i + 2) :
+                                            "this doesn't make any sense");
+                                    telemetry.addData("Tgt", servo_target_positions[list_index]);
                                 }
-                                telemetry.addData("idkp2", servo_target_positions[list_index]);
                                 servo_target_positions[list_index] = Math.max(Math.min(servo_target_positions[list_index], servo_max_positions[list_index]), servo_min_positions[list_index]);
                                 servo_list[list_index].setPosition(servo_target_positions[list_index]);
                             }
@@ -483,6 +526,13 @@ public class TeleOpLogicBase extends RobotHardware {
         }
     }
 
+    /**
+     * @param motor motor name from config file
+     * @param button button name from keys
+     * @param modifier1 default/toggle/button/cycle
+     * @param modifier2 gradient/normal, power down, list increment
+     * @param modifier3 power, power up, or index of list in positions
+     */
     public static void new_keybind(String motor, String button, Object modifier1, Object modifier2, Object modifier3) {
         if (!keybinds.containsKey(motor)) throw new IllegalArgumentException("You misspelled " + motor + " - make sure its exactly as it's spelled in dc motor list or servo list, or it's \"goto\". Idiot");
         if (!(keys.contains(button))) throw new IllegalArgumentException("You misspelled " + button + "  - make sure its exactly as it's spelled in keys. ");

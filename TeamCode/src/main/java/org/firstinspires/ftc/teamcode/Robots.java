@@ -1,19 +1,21 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.Gamepad;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Robots {
     public static void init201() {
-        dc_motor_names = new ArrayList<>(Arrays.asList("Left", "Right"));
-        max_power = new double[] {0.8, 0.8};
-        min_power = new double[] {-0.8, -0.8};
-        motor_max_positions = new double[] {Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY};
-        motor_min_positions = new double[] {Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY};
-        invert_dc_motors = new boolean[] {true, false};
-        p_weights = new double[] {0.05, 0.05};
-        d_weights = new double[] {0.1, 0.1};
+        dc_motor_names = new ArrayList<>(Arrays.asList("Left"));
+        max_power = new double[] {1.0};
+        min_power = new double[] {-1.0};
+        motor_max_positions = new double[] {Double.POSITIVE_INFINITY};
+        motor_min_positions = new double[] {Double.NEGATIVE_INFINITY};
+        invert_dc_motors = new boolean[] {true};
+        p_weights = new double[] {0.05};
+        d_weights = new double[] {0.001};
 
         servo_names = new ArrayList<>(Arrays.asList());
         servo_max_positions = new double[] {};
@@ -38,7 +40,7 @@ public class Robots {
         strafe = -0.8;
         turning_weight = -1.0;
         distance_weight = -1.0;
-        max_speed = 0.5;
+        max_speed = 1.0; // we should change this depending on how high up the arms are
 
         locked_motion = false;
         locked_rotation = false;
@@ -46,9 +48,9 @@ public class Robots {
         use_IMU = true;
         usePID = true;
         p_weight = 0.025;
-        d_weight = 0.85;
+        d_weight = 0.0085;
 
-        axesOrder = AxesOrder.ZYX;
+        axesOrder = AxesOrder.XYZ;
         invertIMU = false;
 
         useRoadRunner = false;
@@ -77,19 +79,18 @@ public class Robots {
     public static void init202() {
         dc_motor_names = new ArrayList<>(Arrays.asList("joint1right", "joint2"));
         max_power = new double[] {0.4, 0.4};
-        min_power = new double[] {-0.1, -0.2};
+        min_power = new double[] {-0.4, -0.2};
         motor_max_positions = new double[] {Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY};
         motor_min_positions = new double[] {Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY};
         invert_dc_motors = new boolean[] {false, false};
         p_weights = new double[] {0.02, 0.02};
-        d_weights = new double[] {0, 0}; // d-control suckssss lmao
+        d_weights = new double[] {0.0001, 0.0001}; // d-control?!?!??!?!?!??!??!??!?!??!?
 
         servo_names = new ArrayList<>(Arrays.asList("clawAligner", "claw"));
         servo_max_positions = new double[] {0.75, 1};
         servo_min_positions = new double[] {0, 0.5};
 
         positions = new double[][] {
-                {0, 100, 200, 300}, //Arm Heights
                 {0.5, 1} //Claw
         };
 
@@ -107,13 +108,15 @@ public class Robots {
         strafe = 1.0;
         turning_weight = 1.0;
         distance_weight = 1.0;
-        max_speed = 0.0;
+        max_speed = 1.0;
 
-        locked_motion = true;
+        locked_motion = false;
         locked_rotation = false;
 
+        drive_type = 1;
+
         use_IMU = false;
-        usePID = true;
+        usePID = false;
         p_weight = 0.025;
         d_weight = 0.85;
 
@@ -158,8 +161,9 @@ public class Robots {
     public static ArrayList<String> distance_sensor_names, touch_sensor_names, color_sensor_names, led_names;
 
     //Driving
-    public static double strafe, turning_weight, distance_weight, max_speed;
+    public static double dead_zone = 0.2, strafe, turning_weight, distance_weight, max_speed;
     public static boolean locked_motion, locked_rotation;
+    public static int drive_type = 0; // 0 means normal, 1 or 2 means custom
 
     //PID
     public static boolean use_IMU, usePID, invertIMU;
@@ -195,11 +199,11 @@ public class Robots {
     public static boolean[] invert_encoders;
 
     public static final ArrayList<String> keys = new ArrayList<>(Arrays.asList(
-            "operator a", "operator b", "operator x", "operator y", "operator dpad_up",
-            "operator dpad_down", "operator dpad_left", "operator dpad_right", "operator left_bumper", "operator right_bumper",
-            "driver a", "driver b", "driver x", "driver y", "driver dpad_up",
-            "driver dpad_down", "driver dpad_left", "driver dpad_right", "driver left_bumper", "driver right_bumper",
-            "operator left_stick_x", "operator right_stick_x", "operator left_stick_y", "operator right_stick_y", "operator left_trigger",
+            "operator a", "operator b", "operator x", "operator y", "operator dpad_up", "operator dpad_down",
+            "operator dpad_left", "operator dpad_right", "operator left_bumper", "operator right_bumper",
+            "driver a", "driver b", "driver x", "driver y", "driver dpad_up", "driver dpad_down", "driver dpad_left",
+            "driver dpad_right", "driver left_bumper", "driver right_bumper", "operator left_stick_x",
+            "operator right_stick_x", "operator left_stick_y", "operator right_stick_y", "operator left_trigger",
             "operator right_trigger", "driver left_trigger"
     )); // DO NOT CHANGE THIS
 
@@ -292,6 +296,8 @@ public class Robots {
 
         led_names = new ArrayList<>(Arrays.asList());
 
+        dead_zone = 0.2;
+
         strafe = 1.0;
         turning_weight = 1.0;
         distance_weight = 1.0;
@@ -299,6 +305,8 @@ public class Robots {
 
         locked_motion = false;
         locked_rotation = false;
+
+        drive_type = 0;
 
         usePID = false;
         p_weight = 0.025;
@@ -329,5 +337,42 @@ public class Robots {
         // ordered by left, right, front
         wheel_names = new ArrayList<>(Arrays.asList("rightFront", "rightBack", "leftBack", "leftFront"));
         // ordered by right front, right back, left back, left front
+    }
+
+    public static double magnitude(double x, double y) {
+        return Math.sqrt(x * x + y * y);
+    }
+
+    public static double vectorToAngle(double x, double y) {
+        if (x == 0) x = 0.001;
+        if (y == 0) y = 0.001;
+        return Math.atan(x / y) + Math.PI * (y > 0 ? 0 : 1) * (x > 0 ? 1 : -1);
+    }
+
+    public static double[] weird_driving(double lsx, double lsy, double rsx, double rsy, Gamepad gamepad) { // already factors in deadzone
+        // should be turning factor, distance factor, offset, Speed factor
+        switch (drive_type) {
+            case 1: // Felix drive
+                double TRIGGER_SENSITIVITY = 0.65, BUTTON_SENSITIVITY = 0.3, LEFT_SENSITIVITY = 1, RIGHT_SENSITIVITY = 0.3;
+
+                double turnAmount = gamepad.left_trigger * TRIGGER_SENSITIVITY + -gamepad.right_trigger * TRIGGER_SENSITIVITY + ((gamepad.left_bumper) ? BUTTON_SENSITIVITY : 0) + (gamepad.right_bumper ? -BUTTON_SENSITIVITY : 0);
+
+                double[] vec = {
+                        lsx * LEFT_SENSITIVITY + rsx * RIGHT_SENSITIVITY,
+                        lsy * LEFT_SENSITIVITY + rsy * RIGHT_SENSITIVITY
+                };
+
+                return new double[] {turnAmount, magnitude(vec[0], vec[1]), vectorToAngle(vec[0], vec[1]), 1};
+            case 2: // Tank drive with triggers
+                double turning = gamepad.right_trigger - gamepad.left_trigger;
+                double forward = gamepad.right_trigger + gamepad.left_trigger;
+                return new double[] {turning, forward, 0, 1};
+            case 3: // Normal tank drive, with right trigger to slow down
+                turning = rsy - lsy;
+                forward = rsx + lsx;
+                return new double[] {turning, forward, 0, 1 + 2 * gamepad.right_trigger};
+            default:
+                return new double[] {gamepad.right_stick_x, Math.sqrt(gamepad.left_stick_x * gamepad.left_stick_x + gamepad.left_stick_y * gamepad.left_stick_y), vectorToAngle(gamepad.left_stick_x, gamepad.left_stick_y), 1};
+        }
     }
 }

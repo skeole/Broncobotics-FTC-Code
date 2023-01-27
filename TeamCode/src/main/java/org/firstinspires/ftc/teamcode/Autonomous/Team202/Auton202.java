@@ -12,9 +12,12 @@ public class Auton202 extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        DoubleArm bhajfiwle = new DoubleArm();
+        DoubleArm bhajfiwle = new DoubleArm(); // IT WORKS!!!!!
         bhajfiwle.init(hardwareMap);
         bhajfiwle.start();
+
+        waitForStart();
+
         sleep(2000);
         bhajfiwle.set_height(1.5);
         telemetry.addData("see, it's in a", "thread");
@@ -26,10 +29,15 @@ public class Auton202 extends LinearOpMode {
         sleep(4000);
         bhajfiwle.set_height(-1); // we will have to figure stuff out, or something, i think we can just not reset the encoder values in teleop
         sleep(2000);
+        bhajfiwle.quit();
+        stop();
     }
 }
 
 class DoubleArm extends Thread {
+
+    public static final double min_x = 0.5;
+    public static final double min_y = -1;
 
     private static DcMotor right_motor, left_motor, joint; // left_motor just follows right_motor
     private static double right_motor_target = 0.0, joint_target = 0.0;
@@ -44,6 +52,11 @@ class DoubleArm extends Thread {
         right_motor = map.get(DcMotor.class, "joint1right");
         left_motor = map.get(DcMotor.class, "joint1left");
         joint = map.get(DcMotor.class, "joint2");
+        right_motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        joint.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        right_motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        joint.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        // I'm resetting them here, not in TeleOp
         wrist = map.get(Servo.class, "clawAligner");
         set_position(1, 0);
     }
@@ -51,6 +64,14 @@ class DoubleArm extends Thread {
     public static void set_position(double x, double y) {
         if (Math.abs(x * x + y * y) > 3.9) {
             return; // will throw an error
+        }
+        if (x < min_x) {
+            set_position(min_x, y);
+            return;
+        }
+        if (y < min_y) {
+            set_position(x, min_y);
+            return;
         }
         double magnitude = Math.sqrt(x * x + y * y);
 
@@ -61,13 +82,11 @@ class DoubleArm extends Thread {
         double target_angle_one = temp_angle + secondary_angle;
         double target_angle_two = target_angle_one + primary_angle - Math.PI;
         double target_angle_three = 0 - target_angle_two;
-        // removing the initial angle
 
         target_angle_one *= ticks_per_radian;
         target_angle_two *= ticks_per_radian;
 
-        target_angle_three *= 6.0 / (5.0 * Math.PI);
-        // 300 is the maximum angle --> 5/6 pi --> sets target angle to 1
+        target_angle_three *= 180.0 / Math.PI;
 
         target_angle_one += first_arm_zero;
         target_angle_two += second_arm_zero;

@@ -13,11 +13,11 @@ import static org.firstinspires.ftc.teamcode.Robots.*;
 
 class TeleOp201OneDriverLogic extends TeleOpLogicBase {
 
-    DcMotor rightMotor;
-    Servo claw;
-    double t_position = 0.6;
+    public static DcMotor rightMotor;
+    public static Servo claw;
+    public static double t_position = 0.6;
 
-    public void execute_non_driver_controlled() {
+    public static void execute_non_driver_controlled() {
 
         telemetry.addData("Angle?", getAngle());
         telemetry.addData("Angle V2", current_angle = 0 - getAngle() - zero_angle); //Only different value if not starting robot straight ahead
@@ -30,9 +30,9 @@ class TeleOp201OneDriverLogic extends TeleOpLogicBase {
 
         rightMotor.setPower(dc_motor_list[0].getPower());
 
-        if (buttons[keys.indexOf("driver a")]) {
+        if (driver_a) {
             t_position = 0.6;
-        } else if (buttons[keys.indexOf("driver b")]) {
+        } else if (driver_b) {
             t_position = 0.2;
         }
 
@@ -46,7 +46,7 @@ class TeleOp201OneDriverLogic extends TeleOpLogicBase {
 
     //Initialization
 
-    public void init(HardwareMap hm, Telemetry tm) {
+    public static void init(HardwareMap hm, Telemetry tm) {
         init201();
         initialize_logic(hm, tm);
         setZeroAngle(0);
@@ -58,11 +58,11 @@ class TeleOp201OneDriverLogic extends TeleOpLogicBase {
 
     }
 
-    public void initRoadRunner(StandardTrackingWheelLocalizer localizer) {
+    public static void initRoadRunner(StandardTrackingWheelLocalizer localizer) {
         initializeRoadRunner(45, 100, 0, localizer);
     }
 
-    public void set_keybinds() {
+    public static void set_keybinds() {
         // Arm
         new_keybind("Left", "driver dpad_up", "default", "normal", 1.0);
         new_keybind("Left", "driver dpad_down", "default", "normal", 0.1);

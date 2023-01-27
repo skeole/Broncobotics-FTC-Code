@@ -61,8 +61,7 @@ public class AutonomousLogicBase extends RobotHardware {
         servo_list[servo_names.indexOf(name)].setPosition(position);
     }
 
+    //RoadRunner
+
     public static void initialize_RoadRunner() {}
-
-    public static void initialize_tensorflow() {}
-
 }

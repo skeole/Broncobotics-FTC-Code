@@ -14,7 +14,7 @@ class TeleOp202Logic extends TeleOpLogicBase {
 
     public static double starting_time;
 
-    public static final double x = 1, max_y = Math.sqrt(4 - x * x) - 0.05, lift_speed = 1.3;
+    public static final double x = 1, max_y = Math.sqrt(4 - x * x) - 0.05, min_y = -1, lift_speed = 1.3;
     public static double y = 0; // starting y value
 
     public final static double
@@ -22,8 +22,8 @@ class TeleOp202Logic extends TeleOpLogicBase {
             second_arm_zero =    -817;
 
     // Encoder Values at straight ahead:
-        //410
-        //-817
+        // 410
+        // -817
 
     public static final double ticks_per_radian = 2786.2109868741 / 2.0 / Math.PI; // 2786.2109868741 ticks per revolution
 
@@ -36,7 +36,13 @@ class TeleOp202Logic extends TeleOpLogicBase {
         if (buttons[5])
             y -= delta_time * lift_speed;
 
-        y = Math.max(Math.min(y, max_y), 0 - max_y);
+        y = Math.max(Math.min(y, max_y), min_y);
+
+        if (y > 1) {
+            max_speed = 0.5;
+        } else {
+            max_speed = 1;
+        }
 
         double magnitude = Math.sqrt(x * x + y * y);
 
@@ -47,13 +53,11 @@ class TeleOp202Logic extends TeleOpLogicBase {
         double target_angle_one = temp_angle + secondary_angle;
         double target_angle_two = target_angle_one + primary_angle - Math.PI;
         double target_angle_three = 0 - target_angle_two;
-        // removing the initial angle
 
         target_angle_one *= ticks_per_radian;
         target_angle_two *= ticks_per_radian;
 
         target_angle_three *= 180.0 / Math.PI; // angle
-            // 300 is the maximum angle --> 5/6 pi --> sets target angle to 1
 
         target_angle_one += first_arm_zero;
         target_angle_two += second_arm_zero;
@@ -64,11 +68,35 @@ class TeleOp202Logic extends TeleOpLogicBase {
 
         dc_target_positions[1] = target_angle_two;
 
-        servo_target_positions[0] = target_angle_three;
-        telemetry.addData("position", servo_list[0].getPosition());
+        servo_target_positions[0] = Math.max(Math.min(target_angle_three, servo_max_positions[0]), servo_min_positions[0]);
 
-        // telemetry.addData("cycles per second", 0.1 * ((int) (10 / delta_time)));
-        // telemetry.addData("elapsed time", 0.1 * ((int) (0.5 + 10.0 * (current_time - starting_time))));
+        telemetry.addData("elapsed time", 0.1 * ((int) (0.5 + 10.0 * (current_time - starting_time))));
+
+        telemetry.addData("operator left trigger", operator_left_trigger);
+
+        telemetry.addData("claw target", servo_target_positions[1]);
+
+        //debugging code
+        for (int i = 0; i < dc_motor_list.length; i++) {
+            telemetry.addData(dc_motor_names.get(i), dc_motor_list[i].getCurrentPosition());
+        }
+
+        telemetry.addLine();
+
+        for (int i = 0; i < servo_list.length; i++) {
+            telemetry.addData(servo_names.get(i), servo_list[i].getPosition());
+        }
+
+        telemetry.addLine();
+
+        for (int i = 0; i < keys.size(); i++) {
+            if ((i < 20) && buttons[i]) {
+                telemetry.addData(keys.get(i), "is pressed");
+            } else if ((i > 19) && Math.abs(axes[i - 20]) > 0.1) {
+                telemetry.addData(keys.get(i) + " value", axes[i - 20]);
+            }
+        }
+        telemetry.addData("y", y);
 
         telemetry.update();
         if (useRoadRunner) {
@@ -86,10 +114,9 @@ class TeleOp202Logic extends TeleOpLogicBase {
         set_keybinds();
         set_button_types();
         left_motor = map.get(DcMotor.class, "joint1left");
-        left_motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        left_motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         left_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         servo_target_positions[0] = 0.6;
+        servo_target_positions[1] = 0.5;
     }
 
     public static void initRoadRunner(StandardTrackingWheelLocalizer localizer) {
@@ -98,9 +125,11 @@ class TeleOp202Logic extends TeleOpLogicBase {
 
     public static void set_keybinds() {
 
-        new_keybind("clawAligner", "operator right_stick_y", "default", 0.3, 0.3);
-        //new_keybind("claw", "operator right_trigger", "default", 0.66, 0.66);
-        //new_keybind("claw", "operator dpad_left", "default", "gradient", -0.66);
+        new_keybind("claw", "operator right_trigger", "default", 0.66, 0.66);
+        new_keybind("claw", "operator left_trigger", "default", -0.66, -0.66);
+        // so it is being pressed ifk
+
+        // new_keybind("claw", "operator a", "cycle", 1, 0); // maybe this?
 
         // TODO: Figure out why operator left_trigger isn't working for this >:(
 
@@ -118,6 +147,7 @@ public class TeleOp202 extends LinearOpMode {
             logic.initRoadRunner(new StandardTrackingWheelLocalizer(hardwareMap, logic));
         }
         while (opModeIsActive()) {
+            telemetry.addData("operator left trigger actual", gamepad2.left_trigger);
             logic.tick(gamepad1, gamepad2);
             logic.execute_non_driver_controlled();
         }

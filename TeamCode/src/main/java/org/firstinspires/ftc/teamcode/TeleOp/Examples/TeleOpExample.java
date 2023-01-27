@@ -11,9 +11,9 @@ import static org.firstinspires.ftc.teamcode.Robots.*;
 
 class TeleOpExampleLogic extends TeleOpLogicBase { //You have to change the class name here
 
-    public double starting_time;
+    public static double starting_time;
 
-    public void execute_non_driver_controlled() {
+    public static void execute_non_driver_controlled() {
         //this will have the telemetry, LEDs, etc.
 
         //Telemetry
@@ -55,7 +55,7 @@ class TeleOpExampleLogic extends TeleOpLogicBase { //You have to change the clas
 
     //Initialization
 
-    public void init(HardwareMap hm, Telemetry tm) {
+    public static void init(HardwareMap hm, Telemetry tm) {
         init_base();
         starting_time = System.nanoTime() / 1000000000.0;
         initialize_logic(hm, tm);
@@ -70,12 +70,12 @@ class TeleOpExampleLogic extends TeleOpLogicBase { //You have to change the clas
         button_types[keys.indexOf("operator a")] = 3; //1 is default, 2 is toggle, 3 is button
     }
 
-    public void initRoadRunner(StandardTrackingWheelLocalizer localizer) {
+    public static void initRoadRunner(StandardTrackingWheelLocalizer localizer) {
         initializeRoadRunner(45, 100, 90, localizer);
         //Direction Robot is facing; if facing left, then it is either -90° or 90°
     }
 
-    public void set_keybinds() {
+    public static void set_keybinds() {
 
         //arm
 
@@ -139,7 +139,7 @@ public class TeleOpExample extends LinearOpMode {
             logic.initRoadRunner(new StandardTrackingWheelLocalizer(hardwareMap, logic));
         }
         while (opModeIsActive()) {
-            logic.tick(gamepad1, gamepad2); //driver is gamepad1, operator is gamepad2
+            logic.tick(gamepad1, gamepad2); // driver is gamepad1, operator is gamepad2
             logic.execute_non_driver_controlled();
         }
     }
