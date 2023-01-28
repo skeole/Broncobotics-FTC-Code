@@ -20,17 +20,16 @@ class TeleOp201Logic extends TeleOpLogicBase {
     public static void execute_non_driver_controlled() {
 
         telemetry.addData("Angle", getAngle());
-        telemetry.addData("Maybe this is the angle", current_angle = 0 - getAngle() - zero_angle); //Only different value if not starting robot straight ahead
+        telemetry.addData("Maybe this is the angle", 0 - getAngle() - zero_angle); // Only different value if not starting robot straight ahead
         //Positive = Rotated clockwise
-
 
         telemetry.update();
 
         rightMotor.setPower(dc_motor_list[0].getPower());
 
-        if (buttons[keys.indexOf("driver a")]) {
+        if (driver_a) {
             t_position = 0.6;
-        } else if (buttons[keys.indexOf("driver b")]) {
+        } else {
             t_position = 0.2;
         }
 
@@ -62,8 +61,8 @@ class TeleOp201Logic extends TeleOpLogicBase {
 
     public static void set_keybinds() {
         // Arm
-        new_keybind("Left", "operator dpad_up", "default", "normal", 0.9);
-        new_keybind("Left", "operator dpad_down", "default", "normal", 0.1);
+        new_keybind("Left", "operator dpad_up", "default", "normal", 0.6);
+        new_keybind("Left", "operator dpad_down", "default", "normal", -0.1);
 
         // V4B
         new_keybind("Virtual", "operator right_stick_y", "default", 1.0, 1.0);

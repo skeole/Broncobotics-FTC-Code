@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.Robots;
 import java.util.HashMap;
 import java.util.Map;
 
-class Auton extends Thread {
+class AutonomousExampleLogic extends Thread {
 
     public static AutonomousLogicBase alb;
     public static StandardTrackingWheelLocalizer stwl;
@@ -89,7 +89,7 @@ public class AutonomousExample extends LinearOpMode {
     AutonomousLogicBase r = new AutonomousLogicBase();
     StandardTrackingWheelLocalizer l;
     Tensorflow t;
-    Auton a;
+    AutonomousExampleLogic a;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -98,7 +98,7 @@ public class AutonomousExample extends LinearOpMode {
         l = new StandardTrackingWheelLocalizer(hardwareMap, r);
         t = new Tensorflow(r);
 
-        a = new Auton();
+        a = new AutonomousExampleLogic();
         a.init(r, l, t);
 
         waitForStart();

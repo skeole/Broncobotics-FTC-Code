@@ -22,13 +22,10 @@ public class WebcamTesting extends LinearOpMode {
         sleep(3000); // waiting for timeout to pass
 
         if (testing) {
-            camera.start();
+            camera.start(); // for some reason the purple side has very low saturation... I don't think its a printing issue
         }
 
         waitForStart();
-
-        telemetry.addLine("testing");
-        telemetry.update();
 
         if (!testing) {
             camera.start();
